@@ -34,10 +34,6 @@ public class QuotesController {
     public Mono<TradingCompanySummary> getTradingSummary(@PathVariable String ticker) {
         Mono<TradingCompany> tradingCompanyMono = tradingCompanyClient.getCompany(ticker);
         Mono<Quote> quoteMono = quotesClient.getLatestQuote(ticker);
-        return Mono.zip(tradingCompanyMono, quoteMono).map((tuple) -> {
-            TradingCompany tradingCompany = tuple.getT1();
-            Quote quote = tuple.getT2();
-            return new TradingCompanySummary(tradingCompany, quote);
-        });
+        return tradingCompanyMono.zipWith(quoteMono, TradingCompanySummary::new);
     }
 }
